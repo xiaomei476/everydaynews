@@ -1,5 +1,17 @@
 export type Confidence = '已确认' | '高可信' | '待验证' | '分析判断';
-export type Channel = 'AI' | '半导体' | '电子' | '政策数据';
+export type Channel =
+  | '人工智能与算力'
+  | '芯片设计与工具'
+  | '芯片制造与器件'
+  | '嵌入式与物联网'
+  | '消费电子与显示'
+  | '通信与数据中心'
+  | '机器人与先进制造'
+  | '汽车交通与航天'
+  | '能源电网与电池'
+  | '生物医药与医疗科技'
+  | '农业食品与物流'
+  | '宏观贸易与规则';
 export type Region = '中国' | '美国' | '欧洲' | '日韩' | '全球';
 export type NewsType = '技术发布' | '产业动作' | '政策规则' | '经济数据';
 
@@ -28,14 +40,63 @@ export type NewsItem = {
   url: string;
   tags: string[];
   readMinutes: number;
+  linkedTrackId?: string;
 };
+
+export type VerificationTrack = {
+  id: string;
+  question: string;
+  linkedNewsIds: string[];
+  industries: Channel[];
+  factStatus: '已确认' | '部分确认' | '待确认';
+  thesisStatus: '待验证' | '初步佐证' | '部分验证' | '已验证' | '证据冲突' | '已失效';
+  currentJudgment: string;
+  priority: 1 | 2 | 3;
+  methods: {
+    task: string;
+    metric: string;
+    sourceTypes: string[];
+    completion: '未开始' | '进行中' | '已完成';
+  }[];
+  supportSignals: string[];
+  refuteSignals: string[];
+  updates: {
+    date: string;
+    summary: string;
+    direction: '支持' | '反驳' | '中性';
+    evidenceType: '官方文件' | '独立测试' | '市场数据' | '客户案例' | '实物产品';
+    sourceName: string;
+    url: string;
+  }[];
+  nextCheck: {
+    date: string;
+    task: string;
+    trigger: string;
+  };
+  lastChangedAt: string;
+};
+
+export const industryCatalog: Array<{ value: Channel; note: string }> = [
+  { value: '人工智能与算力', note: '模型、智能体、算力与安全' },
+  { value: '芯片设计与工具', note: '处理器、IP、EDA 与验证' },
+  { value: '芯片制造与器件', note: '晶圆、封装、存储、模拟与功率器件' },
+  { value: '嵌入式与物联网', note: 'MCU、边缘计算、传感与连接' },
+  { value: '消费电子与显示', note: '终端、显示、接口与可穿戴设备' },
+  { value: '通信与数据中心', note: '云、网络、光通信、服务器与散热' },
+  { value: '机器人与先进制造', note: '自动化、机床、工业软件与材料' },
+  { value: '汽车交通与航天', note: '智能汽车、物流、轨交与航空航天' },
+  { value: '能源电网与电池', note: '电力、储能、新能源与基础设施' },
+  { value: '生物医药与医疗科技', note: '医药、器械、诊断与生物制造' },
+  { value: '农业食品与物流', note: '农业科技、食品、仓储与供应链' },
+  { value: '宏观贸易与规则', note: '经济、就业、金融、贸易与监管' },
+];
 
 export const briefMeta = {
   dateDisplay: '2026.09.04',
-  updatedAt: '08:00 · Asia/Shanghai',
-  edition: 'No. 001',
+  updatedAt: '北京时间 08:00',
+  edition: '第 001 期',
   mainline: '算力不再只是芯片问题：电网、成熟制程、验证效率与安全治理正在一起成为 AI 落地的约束。',
-  summary: '过去 72 小时筛选 10 条高信息密度更新，优先回答“发生了什么、为什么重要、下一步验证什么”。',
+  summary: '过去 72 小时筛选 10 条高信息密度更新，按行业而不是热度组织，并持续验证承诺是否真正落地。',
 };
 
 export const signals = [
@@ -59,18 +120,225 @@ export const signals = [
   },
 ] as const;
 
-export const verificationCalendar = [
-  { date: '未来 7 天', event: '电网专项规划与项目清单', relates: '功率器件 / 储能 / 工业控制' },
-  { date: '未来 14 天', event: '美国工业生产与制造分项', relates: '数据中心资本开支是否扩散' },
-  { date: '未来 30 天', event: '新品独立测试与渠道报价', relates: '显示、开发板、零部件真实可得性' },
-] as const;
+export const verificationTracks: VerificationTrack[] = [
+  {
+    id: 'grid-orders',
+    question: '新型电网政策能否传导为功率电子与储能设备的真实订单？',
+    linkedNewsIds: ['china-new-grid'],
+    industries: ['能源电网与电池', '芯片制造与器件', '通信与数据中心'],
+    factStatus: '已确认',
+    thesisStatus: '待验证',
+    currentJudgment: '政策方向已经确认，但尚缺少量化项目清单和订单数据。',
+    priority: 3,
+    methods: [
+      {
+        task: '跟踪专项规划、项目清单和电网公司集中招标',
+        metric: '投资额、项目数、变压器/变流器/储能系统招标量',
+        sourceTypes: ['主管部门文件', '电网公司招标'],
+        completion: '进行中',
+      },
+      {
+        task: '核对设备与功率器件企业的合同和在手订单',
+        metric: '新增合同、订单同比、交付周期与渠道价格',
+        sourceTypes: ['公司公告', '财报与业绩会'],
+        completion: '未开始',
+      },
+    ],
+    supportSignals: ['出现量化投资计划和集中招标', 'SiC/GaN、储能控制设备订单与交期同步上升'],
+    refuteSignals: ['政策长期停留在原则表述', '项目延期且相关订单、价格、产能利用率没有改善'],
+    updates: [
+      {
+        date: '2026-09-03',
+        summary: '官方会议部署新型电网重大任务，并给出“十五五”用电需求年均约增长 5% 的判断。',
+        direction: '支持',
+        evidenceType: '官方文件',
+        sourceName: '国家发展改革委 / 国家能源局',
+        url: 'https://www.ndrc.gov.cn/fzggw/wld/wanghongzhi/zyhd/202609/t20260903_1407392.html',
+      },
+    ],
+    nextCheck: {
+      date: '未来 7 天',
+      task: '检查专项规划、项目清单及首批招标',
+      trigger: '出现明确投资额、设备数量或中标结果时更新判断',
+    },
+    lastChangedAt: '2026-09-03',
+  },
+  {
+    id: 'agent-security-cost',
+    question: '更强的智能体能力是否会显著抬高企业部署的安全与权限成本？',
+    linkedNewsIds: ['astra-safety'],
+    industries: ['人工智能与算力', '通信与数据中心', '宏观贸易与规则'],
+    factStatus: '已确认',
+    thesisStatus: '待验证',
+    currentJudgment: '能力评级是官方事实，真实攻击复现率与企业成本仍需外部证据。',
+    priority: 3,
+    methods: [
+      {
+        task: '寻找独立红队对高危能力的复现结果',
+        metric: '任务成功率、高危告警、绕过率与人工确认次数',
+        sourceTypes: ['独立评测', '安全研究'],
+        completion: '进行中',
+      },
+      {
+        task: '跟踪云厂商和企业的智能体权限策略',
+        metric: '隔离要求、审计日志、价格与部署周期变化',
+        sourceTypes: ['产品文档', '客户案例'],
+        completion: '未开始',
+      },
+    ],
+    supportSignals: ['第三方复现高危任务能力', '云厂商强制增加隔离、日志或人工确认'],
+    refuteSignals: ['第三方无法复现关键能力', '防护措施使真实风险和部署成本没有明显上升'],
+    updates: [
+      {
+        date: '2026-09-03',
+        summary: '官方将模型网络安全能力列入最高风险等级，并提示仅依赖推理轨迹监测存在局限。',
+        direction: '中性',
+        evidenceType: '官方文件',
+        sourceName: 'OpenAI',
+        url: 'https://openai.com/index/safety-overview-gpt-6-astra/',
+      },
+    ],
+    nextCheck: {
+      date: '2026-09-11',
+      task: '检查第三方红队结果和接口权限文档变化',
+      trigger: '出现可复现评测或企业强制策略时更新',
+    },
+    lastChangedAt: '2026-09-03',
+  },
+  {
+    id: 'gf-adoption',
+    question: 'GF 的 22/40 纳米平台能否形成真实客户流片并按期量产？',
+    linkedNewsIds: ['gf-ux-platform'],
+    industries: ['芯片制造与器件', '嵌入式与物联网'],
+    factStatus: '已确认',
+    thesisStatus: '待验证',
+    currentJudgment: '工艺设计套件已经开放，但客户采用、样片指标和量产进度尚未得到验证。',
+    priority: 2,
+    methods: [
+      {
+        task: '跟踪多项目晶圆排期与具名客户',
+        metric: '流片数量、参与成本、客户与首批样片',
+        sourceTypes: ['晶圆厂公告', '客户公告'],
+        completion: '进行中',
+      },
+      {
+        task: '核对样片性能、车规认证和量产节点',
+        metric: '功耗、良率、认证时间与量产日期',
+        sourceTypes: ['独立测试', '认证信息', '公司公告'],
+        completion: '未开始',
+      },
+    ],
+    supportSignals: ['出现具名客户和首批样片', '功耗、良率与车规认证按路线图完成'],
+    refuteSignals: ['长期没有客户或实物样片', '量产推迟，实测成本或功耗不及现有方案'],
+    updates: [
+      {
+        date: '2026-09-02',
+        summary: '40UX 与 22UX 工艺设计套件已开放，40UX 计划在新加坡进入后续生产阶段。',
+        direction: '支持',
+        evidenceType: '官方文件',
+        sourceName: 'GlobalFoundries',
+        url: 'https://investors.gf.com/news-releases/news-release-details/globalfoundries-announces-customer-availability-ux-platform',
+      },
+    ],
+    nextCheck: {
+      date: '2026-10-02',
+      task: '检查首批客户、多项目晶圆和认证进展',
+      trigger: '出现具名客户、样片或路线图变更时更新',
+    },
+    lastChangedAt: '2026-09-02',
+  },
+  {
+    id: 'ai-eda-quality',
+    question: 'AI 能否缩短芯片验证周期，同时不牺牲覆盖率和流片质量？',
+    linkedNewsIds: ['andes-chipagents'],
+    industries: ['芯片设计与工具', '人工智能与算力'],
+    factStatus: '部分确认',
+    thesisStatus: '初步佐证',
+    currentJudgment: '企业案例显示明显提速，但尚不能证明可跨客户复制，也未披露完整质量指标。',
+    priority: 3,
+    methods: [
+      {
+        task: '比较多个项目的周期、工时和返工',
+        metric: '验证周期、工程师工时、回归失败与返工次数',
+        sourceTypes: ['客户案例', '项目数据'],
+        completion: '进行中',
+      },
+      {
+        task: '跟踪最终覆盖率、错误逃逸和流片结果',
+        metric: '覆盖率、流片后缺陷与客户验收',
+        sourceTypes: ['独立客户', '实物产品'],
+        completion: '未开始',
+      },
+    ],
+    supportSignals: ['至少三个客户获得相近时间收益', '覆盖率不下降且错误逃逸没有增加'],
+    refuteSignals: ['收益仅出现在精选小任务', '人工返工增加、覆盖率下降或流片后错误增加'],
+    updates: [
+      {
+        date: '2026-09-02',
+        summary: 'Andes 案例称定制任务由 8.5 周缩至 6 周，部分验证流程由 2—3 个月缩至约 3 周。',
+        direction: '支持',
+        evidenceType: '客户案例',
+        sourceName: 'Andes Technology',
+        url: 'https://www.andestech.com/en/2026/09/02/chipagents-helps-andes-technology-dramatically-accelerate-custom-processor-design-and-verification/',
+      },
+    ],
+    nextCheck: {
+      date: '2026-09-18',
+      task: '寻找独立客户、覆盖率和流片质量数据',
+      trigger: '出现第二个独立客户或质量指标时更新',
+    },
+    lastChangedAt: '2026-09-02',
+  },
+  {
+    id: 'display-real-world',
+    question: '极高刷新率能否转化为真实画质与延迟收益，而非只提高峰值参数？',
+    linkedNewsIds: ['samsung-odyssey-2027'],
+    industries: ['消费电子与显示', '芯片制造与器件'],
+    factStatus: '已确认',
+    thesisStatus: '待验证',
+    currentJudgment: '目前只有厂商展示规格，接口限制、像素响应、画质和零售价格均待实测。',
+    priority: 2,
+    methods: [
+      {
+        task: '核对接口、压缩传输与分辨率限制',
+        metric: '带宽、色度、压缩模式与显卡要求',
+        sourceTypes: ['产品手册', '独立测试'],
+        completion: '未开始',
+      },
+      {
+        task: '测量像素响应、拖影、延迟、亮度和色彩',
+        metric: '真实刷新率、响应时间、输入延迟、亮度与价格',
+        sourceTypes: ['独立测试', '实物产品'],
+        completion: '未开始',
+      },
+    ],
+    supportSignals: ['独立测试达到标称刷新率和低延迟', '画质、亮度和接口带宽没有明显代价'],
+    refuteSignals: ['最高刷新率仅限低分辨率', '压缩、拖影、亮度下降或成本抵消体验收益'],
+    updates: [
+      {
+        date: '2026-09-04',
+        summary: '已公布多模式刷新率规格，尚无零售产品或媒体工程样机的完整独立测试。',
+        direction: '中性',
+        evidenceType: '官方文件',
+        sourceName: 'Samsung Global Newsroom',
+        url: 'https://news.samsung.com/global/gamescom-2026-samsung-odyssey-breaks-boundaries-supporting-every-way-you-play',
+      },
+    ],
+    nextCheck: {
+      date: '2026-10-04',
+      task: '检查完整接口规格、工程样机测试和价格',
+      trigger: '出现独立实测或零售产品时转入实物验证',
+    },
+    lastChangedAt: '2026-09-04',
+  },
+];
 
 export const news: NewsItem[] = [
   {
     id: 'astra-safety',
     date: '2026-09-03',
     region: '美国',
-    channel: 'AI',
+    channel: '人工智能与算力',
     subcategory: '基础模型 / Agent 安全',
     type: '技术发布',
     importance: 5,
@@ -90,13 +358,14 @@ export const news: NewsItem[] = [
     url: 'https://openai.com/index/safety-overview-gpt-6-astra/',
     tags: ['模型安全', 'Agent', '网络安全', '沙箱'],
     readMinutes: 5,
+    linkedTrackId: 'agent-security-cost',
   },
   {
     id: 'china-new-grid',
     date: '2026-09-03',
     eventDate: '2026-09-01',
     region: '中国',
-    channel: '电子',
+    channel: '能源电网与电池',
     subcategory: '能源电子 / AI 基础设施',
     type: '政策规则',
     importance: 5,
@@ -116,12 +385,13 @@ export const news: NewsItem[] = [
     url: 'https://www.ndrc.gov.cn/fzggw/wld/wanghongzhi/zyhd/202609/t20260903_1407392.html',
     tags: ['电网', '功率器件', '储能', '数据中心'],
     readMinutes: 4,
+    linkedTrackId: 'grid-orders',
   },
   {
     id: 'gf-ux-platform',
     date: '2026-09-02',
     region: '全球',
-    channel: '半导体',
+    channel: '芯片制造与器件',
     subcategory: '晶圆制造 / 边缘 AI',
     type: '技术发布',
     importance: 4,
@@ -141,12 +411,13 @@ export const news: NewsItem[] = [
     url: 'https://investors.gf.com/news-releases/news-release-details/globalfoundries-announces-customer-availability-ux-platform',
     tags: ['PDK', 'MCU', 'BLE', '混合信号', '边缘AI'],
     readMinutes: 5,
+    linkedTrackId: 'gf-adoption',
   },
   {
     id: 'andes-chipagents',
     date: '2026-09-02',
     region: '美国',
-    channel: 'AI',
+    channel: '芯片设计与工具',
     subcategory: 'AI + EDA / RISC‑V',
     type: '产业动作',
     importance: 4,
@@ -166,12 +437,13 @@ export const news: NewsItem[] = [
     url: 'https://www.andestech.com/en/2026/09/02/chipagents-helps-andes-technology-dramatically-accelerate-custom-processor-design-and-verification/',
     tags: ['EDA', 'RISC-V', '验证', 'Agent'],
     readMinutes: 4,
+    linkedTrackId: 'ai-eda-quality',
   },
   {
     id: 'keysight-ai-safety',
     date: '2026-09-03',
     region: '欧洲',
-    channel: '电子',
+    channel: '汽车交通与航天',
     subcategory: '汽车电子 / 测试测量',
     type: '产业动作',
     importance: 3,
@@ -197,7 +469,7 @@ export const news: NewsItem[] = [
     date: '2026-09-04',
     eventDate: '2026-08-27',
     region: '日韩',
-    channel: '电子',
+    channel: '消费电子与显示',
     subcategory: '显示 / 消费电子',
     type: '技术发布',
     importance: 3,
@@ -217,13 +489,14 @@ export const news: NewsItem[] = [
     url: 'https://news.samsung.com/global/gamescom-2026-samsung-odyssey-breaks-boundaries-supporting-every-way-you-play',
     tags: ['OLED', '高刷新率', 'DisplayPort', 'DSC'],
     readMinutes: 4,
+    linkedTrackId: 'display-real-world',
   },
   {
     id: 'china-ppe-standards',
     date: '2026-09-02',
     eventDate: '2026-09-01',
     region: '中国',
-    channel: '政策数据',
+    channel: '宏观贸易与规则',
     subcategory: '国家标准 / 劳动防护',
     type: '政策规则',
     importance: 4,
@@ -248,7 +521,7 @@ export const news: NewsItem[] = [
     id: 'us-trade-july',
     date: '2026-09-03',
     region: '美国',
-    channel: '政策数据',
+    channel: '宏观贸易与规则',
     subcategory: '贸易 / 宏观数据',
     type: '经济数据',
     importance: 4,
@@ -273,7 +546,7 @@ export const news: NewsItem[] = [
     id: 'fed-beige-aug',
     date: '2026-09-02',
     region: '美国',
-    channel: '政策数据',
+    channel: '机器人与先进制造',
     subcategory: '景气 / 产业调查',
     type: '经济数据',
     importance: 4,
@@ -298,7 +571,7 @@ export const news: NewsItem[] = [
     id: 'us-productivity-q2',
     date: '2026-09-03',
     region: '美国',
-    channel: '政策数据',
+    channel: '宏观贸易与规则',
     subcategory: '生产率 / 劳动力成本',
     type: '经济数据',
     importance: 3,
