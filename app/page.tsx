@@ -60,6 +60,7 @@ function StoryCard({
   read,
   onSave,
   onRead,
+  onTrack,
 }: {
   item: NewsItem;
   rank: number;
@@ -67,6 +68,7 @@ function StoryCard({
   read: boolean;
   onSave: () => void;
   onRead: () => void;
+  onTrack: () => void;
 }) {
   const tone = sectorTone[item.channel];
 
@@ -105,10 +107,15 @@ function StoryCard({
               onClick={onSave}
               aria-pressed={saved}
             >
-              {saved ? '已收藏' : '收藏'}
+              {saved ? '★ 已收藏' : '☆ 收藏'}
             </button>
-            <button className="text-button" type="button" onClick={onRead}>
-              {read ? '设为未读' : '标记已读'}
+            <button
+              className={read ? 'text-button is-read-toggle' : 'text-button'}
+              type="button"
+              onClick={onRead}
+              aria-pressed={read}
+            >
+              {read ? '↶ 设为未读' : '✓ 标记已读'}
             </button>
           </div>
         </div>
@@ -126,8 +133,14 @@ function StoryCard({
 
         <details className="analysis-details" open={item.importance === 5}>
           <summary>
-            <span>查看影响与行动信息</span>
-            <span className="summary-hint">重要性 · 影响链 · 爱好者视角 · 后续验证</span>
+            <span className="summary-main">
+              <i aria-hidden="true" />
+              <span>
+                <strong>展开详细分析</strong>
+                <small>重要性、影响链、爱好者视角与后续验证</small>
+              </span>
+            </span>
+            <span className="summary-cta" aria-hidden="true" />
           </summary>
           <div className="analysis-grid">
             <section>
@@ -158,8 +171,12 @@ function StoryCard({
           </div>
           <div className="story-links">
             {item.linkedTrackId && (
-              <a className="track-link" href={'#track-' + item.linkedTrackId}>
-                进入验证追踪 ↓
+              <a
+                className="track-link"
+                href={'#track-' + item.linkedTrackId}
+                onClick={onTrack}
+              >
+                查看对应验证 →
               </a>
             )}
             <a className="source-link" href={item.url} target="_blank" rel="noreferrer">
@@ -300,6 +317,7 @@ export default function Home() {
   const [savedOnly, setSavedOnly] = useState(false);
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [read, setRead] = useState<Set<string>>(new Set());
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -320,6 +338,11 @@ export default function Home() {
     else next.add(id);
     localStorage.setItem(key, JSON.stringify(Array.from(next)));
     return next;
+  };
+
+  const selectIndustry = (value: '全部' | Channel) => {
+    setChannel(value);
+    setSelectedTrackId(null);
   };
 
   const activeIndustries = useMemo(
@@ -355,8 +378,21 @@ export default function Home() {
       .sort((a, b) => b.importance - a.importance || b.date.localeCompare(a.date));
   }, [channel, date, focusOnly, newsType, query, region, saved, savedOnly]);
 
+  const visibleTracks = useMemo(() => {
+    if (selectedTrackId) {
+      return verificationTracks.filter((track) => track.id === selectedTrackId);
+    }
+    if (channel !== '全部') {
+      return verificationTracks.filter((track) => track.industries.includes(channel));
+    }
+    return verificationTracks;
+  }, [channel, selectedTrackId]);
+
+  const selectedNews = selectedTrackId
+    ? news.find((item) => item.linkedTrackId === selectedTrackId)
+    : null;
   const totalMinutes = filteredNews.reduce((sum, item) => sum + item.readMinutes, 0);
-  const evidenceCount = verificationTracks.reduce((sum, track) => sum + track.updates.length, 0);
+  const evidenceCount = visibleTracks.reduce((sum, track) => sum + track.updates.length, 0);
 
   return (
     <main className="site-shell" id="top">
@@ -444,7 +480,7 @@ export default function Home() {
           <button
             className={channel === '全部' ? 'industry-button active' : 'industry-button'}
             type="button"
-            onClick={() => setChannel('全部')}
+            onClick={() => selectIndustry('全部')}
           >
             <span>全部行业</span>
             <small>{news.length}</small>
@@ -454,7 +490,7 @@ export default function Home() {
               className={'industry-button ' + sectorTone[industry.value] + (channel === industry.value ? ' active' : '')}
               type="button"
               key={industry.value}
-              onClick={() => setChannel(industry.value)}
+              onClick={() => selectIndustry(industry.value)}
               title={industry.note}
             >
               <span>{industry.value}</span>
@@ -548,6 +584,7 @@ export default function Home() {
                 read={read.has(item.id)}
                 onSave={() => setSaved((current) => persistSet('solder-saved', current, item.id))}
                 onRead={() => setRead((current) => persistSet('solder-read', current, item.id))}
+                onTrack={() => setSelectedTrackId(item.linkedTrackId || null)}
               />
             ))
           ) : (
@@ -559,7 +596,7 @@ export default function Home() {
                 type="button"
                 onClick={() => {
                   setDate('all');
-                  setChannel('全部');
+                  selectIndustry('全部');
                   setRegion('全部');
                   setNewsType('全部');
                   setQuery('');
@@ -586,7 +623,7 @@ export default function Home() {
                   type="button"
                   key={industry.value}
                   onClick={() => {
-                    setChannel(industry.value);
+                    selectIndustry(industry.value);
                     document.getElementById('brief')?.scrollIntoView();
                   }}
                 >
@@ -630,18 +667,51 @@ export default function Home() {
             <span>持续验证</span>
             <h2>新闻之后，承诺有没有真正兑现？</h2>
             <p>把发布会、政策和公司主张拆成可检查的命题，持续记录支持与反驳证据。</p>
+            {(selectedTrackId || channel !== '全部') && (
+              <div className="verification-scope">
+                <span>
+                  当前仅显示：
+                  {selectedNews ? '《' + selectedNews.title + '》的验证' : channel}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedTrackId(null);
+                    setChannel('全部');
+                  }}
+                >
+                  查看全部验证
+                </button>
+              </div>
+            )}
           </div>
           <div className="verification-stats">
-            <span><strong>{verificationTracks.length}</strong>个追踪命题</span>
+            <span><strong>{visibleTracks.length}</strong>个追踪命题</span>
             <span><strong>{evidenceCount}</strong>条证据记录</span>
-            <span><strong>{verificationTracks.filter((track) => track.methods.some((method) => method.completion === '进行中')).length}</strong>项正在验证</span>
+            <span><strong>{visibleTracks.filter((track) => track.methods.some((method) => method.completion === '进行中')).length}</strong>项正在验证</span>
           </div>
         </div>
 
         <div className="verification-list">
-          {verificationTracks.map((track, index) => (
-            <VerificationCard track={track} index={index} key={track.id} />
-          ))}
+          {visibleTracks.length > 0 ? (
+            visibleTracks.map((track, index) => (
+              <VerificationCard track={track} index={index} key={track.id} />
+            ))
+          ) : (
+            <div className="verification-empty">
+              <h3>这个行业暂时没有进入验证追踪的命题</h3>
+              <p>新闻仍会正常显示；出现可持续验证的承诺、指标或产业判断后再加入。</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedTrackId(null);
+                  setChannel('全部');
+                }}
+              >
+                查看全部验证
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
