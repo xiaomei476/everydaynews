@@ -59,13 +59,6 @@ export const signals = [
   },
 ] as const;
 
-export const variables = [
-  { name: 'Agent 权限成本', direction: '上行', tone: 'up', note: '能力提高后，隔离、审计与人工确认成为刚需' },
-  { name: '成熟制程价值', direction: '重估', tone: 'turn', note: '边缘 AI 需要模拟、RF、嵌入式存储与低成本' },
-  { name: '数据中心链条', direction: '偏强', tone: 'up', note: '电力、散热、连接与工业电子仍有支撑' },
-  { name: '消费端定价力', direction: '偏弱', tone: 'down', note: '企业成本上升，但终端涨价传导受限' },
-] as const;
-
 export const verificationCalendar = [
   { date: '未来 7 天', event: '电网专项规划与项目清单', relates: '功率器件 / 储能 / 工业控制' },
   { date: '未来 14 天', event: '美国工业生产与制造分项', relates: '数据中心资本开支是否扩散' },

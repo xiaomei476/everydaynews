@@ -6,7 +6,6 @@ import {
   briefMeta,
   news,
   signals,
-  variables,
   verificationCalendar,
   type Channel,
   type NewsItem,
@@ -240,11 +239,6 @@ export default function Home() {
             <small>SOLDER · DAILY</small>
           </span>
         </a>
-        <nav className="desktop-nav" aria-label="页内导航">
-          <a href="#brief">今日简报</a>
-          <a href="#variables">关键变量</a>
-          <a href="#method">阅读方法</a>
-        </nav>
         <div className="update-state">
           <span className="live-dot" />
           <span>{briefMeta.dateDisplay}</span>
@@ -432,24 +426,6 @@ export default function Home() {
         </section>
 
         <aside className="intel-rail">
-          <section className="rail-card" id="variables">
-            <div className="rail-title">
-              <span>VARIABLE BOARD</span>
-              <h2>关键变量</h2>
-            </div>
-            <div className="variable-table">
-              {variables.map((variable) => (
-                <div key={variable.name}>
-                  <span className={'direction direction-' + variable.tone}>{variable.direction}</span>
-                  <p>
-                    <strong>{variable.name}</strong>
-                    <small>{variable.note}</small>
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-
           <section className="rail-card">
             <div className="rail-title">
               <span>VERIFY NEXT</span>
@@ -487,18 +463,6 @@ export default function Home() {
             </dl>
           </section>
 
-          <section className="rail-card method-card" id="method">
-            <div className="rail-title">
-              <span>READING PROTOCOL</span>
-              <h2>四步读新闻</h2>
-            </div>
-            <ol>
-              <li><span>01</span><p><strong>先找变量</strong>什么发生了可度量的变化？</p></li>
-              <li><span>02</span><p><strong>再看链条</strong>变化会传到谁的成本、订单和规则？</p></li>
-              <li><span>03</span><p><strong>区分证据</strong>事实、公司主张和我们的推断不能混在一起。</p></li>
-              <li><span>04</span><p><strong>设验证点</strong>下一项数据或实测出来，原判断是否还成立？</p></li>
-            </ol>
-          </section>
         </aside>
       </div>
 
@@ -513,12 +477,6 @@ export default function Home() {
         <p>为电子爱好者过滤噪音，保留会改变生产、技术与规则的信号。</p>
         <a href="#top">返回顶部 ↑</a>
       </footer>
-
-      <nav className="mobile-nav" aria-label="移动端导航">
-        <a href="#brief">简报</a>
-        <a href="#variables">变量</a>
-        <a href="#method">方法</a>
-      </nav>
     </main>
   );
 }
