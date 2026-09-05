@@ -117,10 +117,10 @@ export const signals = [
 ] as const;
 
 export const briefDates = [
-  { value: 'all', label: '本期 · 72 小时', note: '12 条重点' },
-  { value: '2026-09-05', label: '09.05', note: '0 条重点' },
-  { value: '2026-09-04', label: '09.04', note: '9 条重点' },
-  { value: '2026-09-03', label: '09.03', note: '3 条重点' },
+  { value: 'all', label: '本期 · 72 小时', count: 12 },
+  { value: '2026-09-05', label: '09.05', count: 0 },
+  { value: '2026-09-04', label: '09.04', count: 9 },
+  { value: '2026-09-03', label: '09.03', count: 3 },
 ] as const;
 
 export const news: NewsItem[] = [

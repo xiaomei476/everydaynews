@@ -2,7 +2,10 @@
 
 一个面向电子爱好者的中文生产性新闻看板：关注会改变研发、制造、供应链、标准和成本的变量，而不只是追逐热搜。
 
-在线访问：[焊点 · 每日生产情报](https://solder-daily-radar.true-fairy-7392.chatgpt.site/)
+在线访问：
+
+- [主站：焊点 · 每日生产情报](https://solder-daily-radar.true-fairy-7392.chatgpt.site/)
+- [静态备用入口（无需登录）](https://xiaomei476.github.io/everydaynews/)
 
 ## 能看什么
 
@@ -65,5 +68,7 @@ app/
 ## 部署
 
 项目使用 Vinext 与 OpenAI Sites 构建。完成本地检查后，可将代码推送到主分支，再通过已配置的 Sites 项目保存并发布版本。
+
+仓库同时配置了 GitHub Pages 静态镜像。主分支更新后，GitHub Actions 会运行 `pnpm build:pages`，并把 `out/` 发布到备用入口。静态镜像与主站使用同一份新闻数据；收藏和已读状态仍只保存在访问设备本机。
 
 公开站点无需登录查看；本地收藏与已读记录保存在浏览器本机。
