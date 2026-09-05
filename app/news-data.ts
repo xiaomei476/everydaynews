@@ -15,6 +15,27 @@ export type Channel =
 export type Region = '中国' | '美国' | '欧洲' | '日韩' | '全球';
 export type NewsType = '技术发布' | '产业动作' | '政策规则' | '经济数据';
 
+export type LearningAnalysis = {
+  core: string[];
+  logic: {
+    evidence: string;
+    actor: string;
+    position: '上游' | '中游' | '下游' | '规则端';
+    mechanism: string;
+    direction: string;
+  }[];
+  background: {
+    term: string;
+    explanation: string;
+    relevance: string;
+  }[];
+  watch: {
+    item: string;
+    signal: string;
+    meaning: string;
+  }[];
+};
+
 export type NewsItem = {
   id: string;
   date: string;
@@ -41,6 +62,7 @@ export type NewsItem = {
   tags: string[];
   readMinutes: number;
   linkedTrackId?: string;
+  analysis: LearningAnalysis;
 };
 
 export type VerificationTrack = {
@@ -89,7 +111,7 @@ export const industryCatalog: Array<{ value: Channel; note: string }> = [
 
 export const briefMeta = {
   dateDisplay: '2026.09.05',
-  updatedAt: '北京时间 13:30',
+  updatedAt: '北京时间 21:00 更新',
   edition: '第 002 期',
   mainline: 'AI 投入正在变成芯片收入和设备交付；与此同时，关税、产品安全与电力规则开始重写真实部署成本。',
   summary: '过去 72 小时精选 12 条一手更新：不按地区凑数，只保留会改变订单、成本、技术路线或合规边界的信息。',
@@ -140,6 +162,29 @@ export const news: NewsItem[] = [
     sourceName: 'Broadcom 投资者关系', sourceDate: '2026-09-02',
     url: 'https://investors.broadcom.com/news-releases/news-release-details/broadcom-inc-announces-third-quarter-fiscal-year-2026-financial',
     tags: ['AI 加速器', 'ASIC', '网络芯片', 'HBM', '财报'], readMinutes: 5, linkedTrackId: 'ai-infra-conversion',
+    analysis: {
+      core: [
+        'Broadcom 已经把一部分云厂商的 AI 建设预算转化为本季度确认的芯片收入，167 亿美元是已交付并计入财报的结果。',
+        '收入来自定制 AI 加速器和数据中心网络芯片，不只是通用 GPU。',
+        '第四季度 217 亿美元仍是管理层预测，不能与本季度实绩放在同一证据等级。',
+      ],
+      logic: [
+        { evidence: 'AI 半导体收入同比增长 221%', actor: 'Broadcom、代工厂、HBM 与封装供应商', position: '中游', mechanism: '云厂商订单已进入芯片交付，芯片公司会向晶圆、存储和封装环节追加采购。', direction: '已确认的订单传导增强，上述供应商短期受益。' },
+        { evidence: 'AI 收入已占总营收的一半以上', actor: 'Broadcom 与主要云客户', position: '下游', mechanism: '收入更依赖少数大型客户后，客户推迟项目或改变自研路线会更快影响供应商。', direction: '增长更强，但客户集中风险同步上升。' },
+        { evidence: '下一季度指引继续上调', actor: '晶圆、HBM、先进封装与高速网络厂商', position: '上游', mechanism: '若指引兑现，新增需求会继续占用有限的先进制程、堆叠存储和封装产能。', direction: '可能继续拉长交期；目前仍是待验证判断。' },
+      ],
+      background: [
+        { term: 'ASIC', explanation: '为特定任务定制的芯片。这里指云厂商针对 AI 训练或推理设计、由 Broadcom 协助实现的加速器。', relevance: '它说明 AI 算力市场不只有通用 GPU，一部分需求正在转向客户自研芯片。' },
+        { term: 'HBM', explanation: '高带宽存储器，把多层存储芯片堆叠在一起，为 AI 芯片持续提供大量数据。', relevance: '算力芯片增加时，HBM 容量、良率和封装常会成为共同瓶颈。' },
+        { term: '先进封装', explanation: '把计算芯片、HBM 等多个裸片高密度连接在同一封装中的制造环节。', relevance: '芯片设计完成不等于可以出货，封装产能不足仍会限制交付量。' },
+        { term: '业绩指引', explanation: '公司对下一季度收入或利润的预测，不是已经发生的收入。', relevance: '判断趋势时要把财报实绩与管理层预测分开。' },
+      ],
+      watch: [
+        { item: '第四季度实际 AI 收入', signal: '是否达到 217 亿美元指引', meaning: '达到说明订单继续转成出货；明显低于指引则要检查延期或客户集中风险。' },
+        { item: '客户集中度', signal: '前几大客户收入占比与单一项目变化', meaning: '集中度继续升高会让增长对少数云厂商资本开支更敏感。' },
+        { item: 'HBM 与先进封装交期', signal: '交期、利用率、扩产和取消订单', meaning: '交期仍长且取消率低，才能支持供应链需求持续偏紧的判断。' },
+      ],
+    },
   },
   {
     id: 'semi-equipment-q2', date: '2026-09-04', eventDate: '2026-06-30', region: '全球',
@@ -156,6 +201,28 @@ export const news: NewsItem[] = [
     maturity: '已发生的商业销售，新增产能仍在建设与爬坡。', sourceName: 'SEMI', sourceDate: '2026-09-03',
     url: 'https://www.semi.org/en/semi-press-release/global-semiconductor-equipment-billings-increased-23-percent-year-over-year-in-q2-2026-semi-reports',
     tags: ['半导体设备', '晶圆制造', '资本开支', '存储', '供应链'], readMinutes: 4, linkedTrackId: 'ai-infra-conversion',
+    analysis: {
+      core: [
+        '晶圆厂在 2026 年第二季度实际接收并付款的半导体设备达到 405.3 亿美元，销售额连续第二季创新高。',
+        '设备先于新增芯片产能投入生产，因此它是未来供给变化的领先信号。',
+        '设备到厂后还要安装、调试并提高良率，纪录销售并不等于芯片会立刻增产或降价。',
+      ],
+      logic: [
+        { evidence: '设备销售同比增长 23%、环比增长 11%', actor: '光刻、沉积、刻蚀、检测设备商', position: '上游', mechanism: '晶圆厂扩产先采购生产设备，设备商比芯片终端更早确认收入。', direction: '设备订单与交付处于扩张阶段。' },
+        { evidence: '动力集中在先进逻辑与存储投资', actor: '先进制程晶圆厂、存储厂与封装厂', position: '中游', mechanism: 'AI 芯片需要先进逻辑、HBM 和复杂封装，资本开支向这些瓶颈集中。', direction: '高端产能扩张快于成熟制程，但不同品类不能一概而论。' },
+        { evidence: '销售额只记录设备交付', actor: 'GPU、存储与开发板买家', position: '下游', mechanism: '设备需要经过厂房配套、工艺验证和良率爬坡，才能变成可出售的芯片。', direction: '对终端供给是中期改善信号，不是即时降价信号。' },
+      ],
+      background: [
+        { term: '资本开支', explanation: '企业购买厂房、设备等长期资产的支出。晶圆厂买设备属于资本开支，不是日常材料费用。', relevance: '它显示企业愿意为未来产能投入真金白银，但不能保证最终需求一定存在。' },
+        { term: '良率爬坡', explanation: '新生产线从大量次品逐步调整到稳定产出合格芯片的过程。', relevance: '设备安装完成后，良率决定新增产能能否形成可卖产品。' },
+        { term: '领先指标', explanation: '通常早于目标结果发生、可用于观察未来方向的数据。', relevance: '设备销售领先于晶圆产出，但领先时间和传导强度需要继续验证。' },
+      ],
+      watch: [
+        { item: '设备订单积压与取消率', signal: '积压订单继续增长且取消较少', meaning: '说明扩产计划仍在执行；取消增加可能表示需求预期转弱。' },
+        { item: '新增产线利用率与良率', signal: '投产后的稼动率、良率和合格晶圆数', meaning: '这些指标改善后，设备交付才真正转为芯片供给。' },
+        { item: '设备类别与地区明细', signal: '先进逻辑、存储、成熟制程各自增速', meaning: '可判断扩产集中在哪条产业链，避免用总额推断所有芯片都景气。' },
+      ],
+    },
   },
   {
     id: 'nvidia-pair', date: '2026-09-04', region: '美国', channel: '消费电子与显示',
@@ -171,6 +238,29 @@ export const news: NewsItem[] = [
     maturity: '软件公开测试；生产稳定性和性能泛化程度待验证。', sourceName: 'NVIDIA', sourceDate: '2026-09-03',
     url: 'https://blogs.nvidia.com/blog/local-ai-ifa-next-gen-agents-nv-pair-rtx-spark/',
     tags: ['本地 AI', 'RTX', '推理集群', 'Ollama', 'AI PC'], readMinutes: 5,
+    analysis: {
+      core: [
+        'PAIR 可以把局域网内多台 RTX、DGX Spark 或 Apple M4 设备登记为多个本地推理节点。',
+        '它把彼此独立的请求分发给空闲节点，提高多任务并发量。',
+        '它不会把多台机器的显存合并，所以单个装不下的模型仍然不能因此运行。',
+      ],
+      logic: [
+        { evidence: '软件免费开源并兼容 Ollama、LM Studio', actor: '个人开发者与小团队', position: '下游', mechanism: '已有设备可被统一调度，减少重新购买服务器或为部分任务调用云接口。', direction: '本地多任务实验门槛下降。' },
+        { evidence: '厂商测试吞吐最高提升 1.9 倍', actor: '局域网、节点调度与设备厂商', position: '中游', mechanism: '多个独立请求并行处理时，空闲 GPU 被更充分利用；网络和调度开销会抵消部分收益。', direction: '并发吞吐可能提高，单次请求延迟未必降低。' },
+        { evidence: '不支持显存合并', actor: '需要运行大模型的用户', position: '下游', mechanism: '每个请求仍必须完整装入某一台机器的内存或显存。', direction: '适合请求池，不是分布式大模型训练或张量并行方案。' },
+      ],
+      background: [
+        { term: '推理', explanation: '把已经训练好的模型加载到设备上，根据输入生成结果的运行过程。', relevance: 'PAIR 调度的是推理请求，不负责训练模型。' },
+        { term: '吞吐量', explanation: '单位时间内完成的请求数量。', relevance: '多台机器可提高同时处理任务的总量，但单个任务不一定更快。' },
+        { term: '显存', explanation: 'GPU 自带的高速内存，用来存放模型参数和运行时数据。', relevance: 'PAIR 不合并显存，因此最大模型大小仍受单台设备限制。' },
+        { term: '异构调度', explanation: '在性能和架构不同的设备之间分配任务。', relevance: 'RTX 与 M4 速度、内存和软件栈不同，调度策略决定实际利用率。' },
+      ],
+      watch: [
+        { item: '独立性能测试', signal: '同一批提示词下的吞吐、延迟、功耗', meaning: '只有同时记录三项，才能判断多节点是否比单机或云端更划算。' },
+        { item: '故障恢复', signal: '节点掉线、请求重试和结果重复率', meaning: '故障时能否稳定恢复决定它是否可用于长期服务。' },
+        { item: '鉴权与加密', signal: '节点身份校验、传输加密和访问日志', meaning: '局域网中的其他设备能否伪装节点或读取请求，是实际部署的安全边界。' },
+      ],
+    },
   },
   {
     id: 'china-power-safety-rule', date: '2026-09-04', eventDate: '2026-08-30', region: '中国',
@@ -187,6 +277,28 @@ export const news: NewsItem[] = [
     maturity: '法规已公布，尚未施行；配套技术要求和实际执法待观察。', sourceName: '国家能源局', sourceDate: '2026-09-04',
     url: 'https://www.nea.gov.cn/20260904/2165aeebb935486cb20e8b560414bed0/c.html',
     tags: ['电力安全', '新型储能', '分布式新能源', '并网', '应急'], readMinutes: 6, linkedTrackId: 'power-safety-compliance',
+    analysis: {
+      core: [
+        '新版行政法规把更多分布式发电、储能和其他并网主体纳入电力安全责任体系。',
+        '责任包括服从调度、执行技术标准、排查风险、进行应急演练和完成整改评价。',
+        '法规将在 2027 年 1 月 1 日施行，但具体需要增加哪些硬件仍要看配套标准和执法文件。',
+      ],
+      logic: [
+        { evidence: '安全责任覆盖范围扩大', actor: '储能站、分布式电源与数据中心等并网主体', position: '下游', mechanism: '安全要求由项目建议变为可追责义务，项目方需要留下设计、运行和整改证据。', direction: '合规与运维工作量上升。' },
+        { evidence: '要求统一调度、风险排查和应急处置', actor: '保护控制、监测、通信与测试设备商', position: '中游', mechanism: '如果配套标准新增测量、隔离、日志或远程控制要求，项目方需要采购或改造设备。', direction: '可能增加设备需求，但目前还不能从法规直接推导订单。' },
+        { evidence: '生效日期明确但技术细则未齐', actor: '电网公司、监管部门与项目业主', position: '规则端', mechanism: '标准、检查表、招标条款和处罚案例会把原则性法规转成可执行要求。', direction: '真正的产业影响取决于后续执行强度。' },
+      ],
+      background: [
+        { term: '并网主体', explanation: '把发电、储能或用电设施接入公共电网并与其交换电能的单位。', relevance: '接入电网后，设备故障可能影响更大范围，因此要承担统一的安全义务。' },
+        { term: '继电保护', explanation: '检测短路、过流等异常并快速切断故障部分的保护系统。', relevance: '若新标准提高故障检测和隔离要求，保护装置、传感器和测试需求会变化。' },
+        { term: '统一调度', explanation: '由电网调度机构统一下发运行指令，以维持频率、电压和供需平衡。', relevance: '储能控制器不能只按本地策略工作，还要满足通信和调度接口要求。' },
+      ],
+      watch: [
+        { item: '配套技术标准', signal: '是否新增采样精度、保护动作、日志或通信要求', meaning: '出现明确功能参数后，才能判断哪些器件和设备产生增量需求。' },
+        { item: '招标与整改清单', signal: '新增设备数量、预算与交付时间', meaning: '它能把政策影响从原则判断升级为真实订单。' },
+        { item: '首批执法案例', signal: '被认定的问题、整改期限和处罚依据', meaning: '可确认地方执行是否严格，以及项目方最先补哪一类能力。' },
+      ],
+    },
   },
   {
     id: 'nhtsa-cybercab-audit', date: '2026-09-04', region: '美国', channel: '汽车交通与航天',
@@ -202,6 +314,28 @@ export const news: NewsItem[] = [
     maturity: '商业部署已开始；合规结论和规模化路径待审查。', sourceName: '美国国家公路交通安全管理局', sourceDate: '2026-09-04',
     url: 'https://www.nhtsa.gov/press-releases/investigation-tesla-cybercab-self-certification',
     tags: ['Cybercab', '自动驾驶', '功能安全', '整车认证', '审计'], readMinutes: 5, linkedTrackId: 'cybercab-certification',
+    analysis: {
+      core: [
+        'Cybercab 开始无车内安全员的商业服务后，美国监管机构启动了车辆自我认证审计。',
+        '审计要求 Tesla 证明整车符合适用的联邦安全标准，并提供可追溯的测试与认证材料。',
+        '启动审计只表示进入强制核验，不表示监管机构已经认定违规。',
+      ],
+      logic: [
+        { evidence: '审查对象是整车自我认证', actor: 'Tesla 与自动驾驶整车厂', position: '中游', mechanism: '企业不仅要证明算法能行驶，还要证明转向、制动、座舱、软件更新等整车系统符合规则。', direction: '上市所需证据和验证成本上升。' },
+        { evidence: '车辆没有车内安全员', actor: '制动、转向、传感器与车载计算供应商', position: '上游', mechanism: '人工接管路径减少后，单点故障需要由冗余硬件、故障降级和日志证据覆盖。', direction: '安全关键部件和验证工具的重要性提高。' },
+        { evidence: '当前没有违规结论', actor: '监管部门、运营商与乘客', position: '规则端', mechanism: '只有具体不符合项、整改或执法决定才会改变车辆配置或部署节奏。', direction: '现阶段应标记为监管风险，而不是确定性利空。' },
+      ],
+      background: [
+        { term: '自我认证', explanation: '车企自行确认车辆符合联邦安全标准，并对提交结果负责；监管机构可事后抽查和执法。', relevance: '审计核查的是企业证据是否足以支撑这项声明。' },
+        { term: '功能安全', explanation: '当电子电气系统发生故障时，系统仍能避免不可接受风险的一套设计与验证方法。', relevance: '自动驾驶的传感、计算和执行器失效都需要预先定义安全响应。' },
+        { term: '冗余', explanation: '为关键功能准备独立的备用路径，例如双路供电、传感或制动控制。', relevance: '没有安全员时，备用路径是否真正独立会成为审查重点。' },
+      ],
+      watch: [
+        { item: '监管卷宗与企业答复', signal: '是否列出具体不符合项或补充材料要求', meaning: '具体问题出现后，才能定位受影响的硬件、软件和测试环节。' },
+        { item: '量产车版本变化', signal: '传感器、制动转向、座舱与软件版本变更', meaning: '实物或软件变化可证明审计开始传导到产品设计。' },
+        { item: '最终执法结果', signal: '整改、罚款、召回或审计结束', meaning: '它决定影响是短期材料补充还是长期认证门槛变化。' },
+      ],
+    },
   },
   {
     id: 'usa-rare-earth-serra-verde', date: '2026-09-04', eventDate: '2026-09-03', region: '美国',
@@ -218,6 +352,28 @@ export const news: NewsItem[] = [
     maturity: '并购已完成、矿山在产；扩产和完整下游链仍在建设。', sourceName: '美国证券交易委员会文件', sourceDate: '2026-09-04',
     url: 'https://www.sec.gov/Archives/edgar/data/1970622/000121390026097399/ea030400101ex99-1.htm',
     tags: ['稀土', '永磁体', '电机', '供应链', '并购'], readMinutes: 5,
+    analysis: {
+      core: [
+        'USA Rare Earth 已完成对巴西 Serra Verde 的控制权交易，获得一处已开始生产的稀土资源。',
+        '公司计划把矿山、稀土氧化物、合金和永磁体连接成一条受其控制的供应链。',
+        '并购已经完成，但二期产能、分离纯度和下游磁体订单仍是未来目标。',
+      ],
+      logic: [
+        { evidence: '获得在产矿山控制权', actor: '稀土开采与分离企业', position: '上游', mechanism: '控制资源可降低原料依赖，但矿石仍要经过分离、提纯才能用于磁体。', direction: '原料保障增强，不等于高性能磁材立即增产。' },
+        { evidence: '计划延伸到合金和永磁体', actor: '磁体、电机与机器人厂商', position: '中游', mechanism: '纵向整合减少跨公司采购环节，并可能提高原料去向的可控性。', direction: '若产能和质量兑现，供应来源会增加；现阶段仍需验证。' },
+        { evidence: '二期目标仍在调试计划中', actor: '无人机、汽车与工业设备客户', position: '下游', mechanism: '产量、纯度、良率和客户认证任何一项延迟，都会推迟磁体实际供给。', direction: '不能把规划吨数直接计入可用供应。' },
+      ],
+      background: [
+        { term: '稀土氧化物', explanation: '稀土矿经过选矿、分离和提纯后形成的中间原料，之后还需制成金属、合金和磁体。', relevance: '新闻中的吨数不是电机可直接使用的永磁体吨数。' },
+        { term: '永磁体', explanation: '无需持续供电就能保持磁性的材料，高性能电机常使用钕铁硼磁体。', relevance: '它直接影响电机的体积、转矩、效率和耐温能力。' },
+        { term: '纵向整合', explanation: '同一家公司控制从上游原料到下游产品的多个生产环节。', relevance: '它可能提高供应稳定性，也会增加建设资金和运营复杂度。' },
+      ],
+      watch: [
+        { item: '实际产量与纯度', signal: '季度产量、回收率和可销售产品规格', meaning: '达到稳定规格才表示矿山产能能进入下游制造。' },
+        { item: '二期资本开支与调试', signal: '设备安装、预算变化和投产日期', meaning: '延迟或超支会削弱规划产能的可信度。' },
+        { item: '磁体客户订单', signal: '具名客户、认证完成和可核验合同', meaning: '真实订单可证明材料质量和价格已经被下游接受。' },
+      ],
+    },
   },
   {
     id: 'fda-etcamah-ctdna', date: '2026-09-04', region: '美国', channel: '生物医药与医疗科技',
@@ -233,6 +389,29 @@ export const news: NewsItem[] = [
     maturity: '监管加速批准并可临床使用，长期获益仍需确认。', sourceName: '美国食品药品监督管理局', sourceDate: '2026-09-04',
     url: 'https://www.fda.gov/news-events/press-announcements/fda-grants-accelerated-approval-new-breast-cancer-treatment',
     tags: ['液体活检', 'ctDNA', 'ESR1', '伴随诊断', '精准医疗'], readMinutes: 5,
+    analysis: {
+      core: [
+        'FDA 同时批准了一种乳腺癌用药方案和与之配套的血液检测方法。',
+        '检测在血液中发现 ESR1 耐药突变后，可在影像确认肿瘤进展之前触发换药决策。',
+        '本次采用加速批准路径，长期临床获益还要由验证性试验确认。',
+      ],
+      logic: [
+        { evidence: '血液突变结果可以触发换药', actor: '测序平台、检测试剂与临床实验室', position: '中游', mechanism: '诊断结果从辅助信息变为治疗入口，需要稳定的样本处理、测序和算法判读。', direction: '伴随诊断的检测量和质量要求提高。' },
+        { evidence: '无进展生存期为 16.0 个月对 9.2 个月', actor: '患者、医生与药企', position: '下游', mechanism: '若检测能更早发现耐药，医生可以提前切换药物并延长疾病未恶化时间。', direction: '支持临床采用，但不能直接等同于总体寿命延长。' },
+        { evidence: '采用加速批准', actor: '药企、检测公司与监管机构', position: '规则端', mechanism: '监管允许基于中间终点先上市，同时要求后续试验确认真实获益。', direction: '商业化已经开始，结论仍可能被后续证据调整。' },
+      ],
+      background: [
+        { term: 'ctDNA', explanation: '肿瘤细胞释放到血液中的短 DNA 片段，可以通过抽血检测其中的突变。', relevance: '它让医生有机会在影像变化之前发现耐药信号。' },
+        { term: '伴随诊断', explanation: '用来判断患者是否适合某种特定药物的获批检测。', relevance: '检测结果会直接影响能否使用本条新闻中的治疗方案。' },
+        { term: '无进展生存期', explanation: '从治疗开始到疾病恶化或死亡的时间，不等于患者总体寿命。', relevance: '它是本次批准的关键疗效指标，但仍需观察总体生存获益。' },
+        { term: '加速批准', explanation: '监管基于可较早获得的指标允许药物先上市，同时要求完成验证性试验。', relevance: '批准是事实，长期获益仍有撤回或修正的可能。' },
+      ],
+      watch: [
+        { item: '验证性试验', signal: '总体生存期和长期不良反应', meaning: '确认获益后判断才能升级；失败可能导致适应证调整。' },
+        { item: '检测性能', signal: '检测下限、灵敏度、特异度和假阳性率', meaning: '性能不稳定会导致错误换药，限制真实临床使用。' },
+        { item: '真实采用与支付', signal: '医院检测量、医保或商业保险覆盖', meaning: '只有医生实际开检且费用可支付，技术价值才会转成稳定需求。' },
+      ],
+    },
   },
   {
     id: 'fao-food-price-aug', date: '2026-09-04', eventDate: '2026-08-31', region: '全球',
@@ -248,6 +427,28 @@ export const news: NewsItem[] = [
     watch: '核对下一月指数、主要产区天气、出口限制、库存与海运价格，判断上涨是短期冲击还是持续趋势。',
     maturity: '已发布的月度市场数据，后续月份可验证持续性。', sourceName: '联合国粮农组织', sourceDate: '2026-09-04',
     url: 'https://www.fao.org/worldfoodsituation/foodpricesindex/en/', tags: ['食品价格', '糖', '植物油', '物流', '通胀'], readMinutes: 4,
+    analysis: {
+      core: [
+        '联合国粮农组织的全球食品价格指数在 8 月升至 133.3 点，环比上涨 1.9%。',
+        '五个主要食品类别同时上涨，其中糖的月度涨幅最大。',
+        '这是全球大宗食品原料价格的加权指数，不是任何一个国家超市零售价的直接涨幅。',
+      ],
+      logic: [
+        { evidence: '五个分项同步上涨', actor: '农产品贸易商与食品加工企业', position: '上游', mechanism: '多类原料同时变贵，会提高采购和库存占用成本。', direction: '成本压力比单一品种上涨更广，但持续性仍需观察。' },
+        { evidence: '糖价环比上涨 11.9%', actor: '饮料、烘焙和加工食品企业', position: '中游', mechanism: '高用量企业先消耗低价库存，再按新价格补库，成本传导存在时间差。', direction: '相关品类利润可能先受压，随后才可能调价。' },
+        { evidence: '指数与零售价不是同一口径', actor: '零售商与消费者', position: '下游', mechanism: '加工、包装、运输、汇率和当地竞争共同决定终端售价。', direction: '不能用 1.9% 直接推算消费者通胀。' },
+      ],
+      background: [
+        { term: '价格指数', explanation: '把多种商品价格按固定权重合成的相对数值，用于观察总体方向。', relevance: '133.3 点本身不是价格，重要的是与上月、上年和各分项比较。' },
+        { term: '成本传导', explanation: '上游原料涨价经过加工、库存、运输和零售后影响终端价格的过程。', relevance: '传导可能被库存和企业利润吸收，也可能延迟数月。' },
+        { term: '库存周期', explanation: '企业先使用已有库存，再按当前价格补货的经营节奏。', relevance: '它决定本月原料涨价何时进入企业成本和商品售价。' },
+      ],
+      watch: [
+        { item: '连续三个月分项走势', signal: '糖、植物油、谷物是否持续同向上涨', meaning: '连续上涨比单月波动更能支持广泛成本压力的判断。' },
+        { item: '产区供给与库存', signal: '天气、库存消费比和出口限制', meaning: '供给恢复会削弱上涨，库存下降和出口收紧则可能延长行情。' },
+        { item: '海运与本地零售数据', signal: '运价、加工企业毛利和食品零售价', meaning: '可确认全球原料变化是否已经传导到具体市场。' },
+      ],
+    },
   },
   {
     id: 'us-jobs-aug', date: '2026-09-04', eventDate: '2026-08-31', region: '美国', channel: '宏观贸易与规则',
@@ -262,6 +463,28 @@ export const news: NewsItem[] = [
     watch: '关注后续修订、工时、制造业分项、数据中心投资与信息业就业是否持续背离。',
     maturity: '官方月度初值，后续会修订。', sourceName: '美国劳工统计局', sourceDate: '2026-09-04',
     url: 'https://www.bls.gov/news.release/archives/empsit_09042026.htm', tags: ['非农就业', '制造业', '信息业', '工资', '经济数据'], readMinutes: 4,
+    analysis: {
+      core: [
+        '美国 8 月非农就业初值增加 16.2 万，失业率为 4.1%。',
+        '制造业就业增加 1.6 万，信息行业减少 2.3 万，两个分项方向相反。',
+        '这是单月初值并会修订，只能说明当前岗位结构分化，不能单独证明 AI 替代就业或电子行业景气。',
+      ],
+      logic: [
+        { evidence: '制造业就业增加 1.6 万', actor: '制造企业与劳动力市场', position: '中游', mechanism: '企业在订单、产能和人员需求改善时可能增加招聘，但就业通常晚于订单变化。', direction: '对制造活动是弱支持信号，需要订单和工时交叉验证。' },
+        { evidence: '信息行业就业减少 2.3 万', actor: '软件、数据处理与托管企业', position: '下游', mechanism: '岗位减少可能来自效率提升、企业重组或需求变化，行业统计不能区分具体原因。', direction: '说明就业承压，但不能直接归因于 AI。' },
+        { evidence: '总量仍增加且数据可修订', actor: '企业融资与资本开支决策', position: '规则端', mechanism: '就业和工资会影响利率预期与企业成本，随后才可能间接影响设备和软件预算。', direction: '宏观数据到电子订单的传导较弱，不能作为单独买卖或行业结论。' },
+      ],
+      background: [
+        { term: '非农就业', explanation: '美国除农业等少数行业外的受薪岗位变化，是月度劳动力市场指标。', relevance: '它覆盖面广，但不能直接代表某个电子细分行业。' },
+        { term: '初值与修订', explanation: '首次公布的数据基于不完整样本，之后会随着更多企业回报而调整。', relevance: '判断趋势时应看修订结果和三个月平均，而非只看一个 headline 数字。' },
+        { term: '平均工时', explanation: '员工每周工作时长，企业常先调整工时，再决定增加或减少人员。', relevance: '它可能比就业人数更早显示制造订单强弱。' },
+      ],
+      watch: [
+        { item: '后续两次修订', signal: '16.2 万是否被持续上调或下调', meaning: '大幅下修会改变对就业韧性的判断。' },
+        { item: '制造业工时与新订单', signal: '加班、采购经理新订单和职位空缺', meaning: '三者同步改善时，制造招聘才更可能对应真实需求。' },
+        { item: '企业资本开支', signal: '设备、软件和数据中心预算', meaning: '资本开支比岗位数量更直接连接电子设备与芯片订单。' },
+      ],
+    },
   },
   {
     id: 'astra-safety', date: '2026-09-03', region: '美国', channel: '人工智能与算力',
@@ -276,6 +499,29 @@ export const news: NewsItem[] = [
     watch: '寻找独立红队复现、真实事故、企业权限架构与审计成本数据，而不是重复引用厂商评级。',
     maturity: '模型已部署，外部风险和治理成本仍在实证阶段。', sourceName: 'OpenAI', sourceDate: '2026-09-03',
     url: 'https://openai.com/index/safety-overview-gpt-6-astra/', tags: ['智能体', '网络安全', '最小权限', '审计', '模型安全'], readMinutes: 6, linkedTrackId: 'agent-security-cost',
+    analysis: {
+      core: [
+        'OpenAI 把 GPT-6 Astra 的网络安全能力评为 Preparedness Framework 的 Critical 级别。',
+        '公司披露了 54,000 多项内部任务和相应的监测、权限控制措施。',
+        '评级与任务结果来自模型提供方，尚不能等同于独立团队已复现真实攻击或企业部署成本已经上升。',
+      ],
+      logic: [
+        { evidence: '模型可以完成更多高风险网络任务', actor: '部署智能体的企业与开发团队', position: '下游', mechanism: '智能体能调用浏览器、终端和代码工具后，可接触的凭据与系统数量增加。', direction: '潜在攻击面扩大。' },
+        { evidence: '约一半内部任务触发高严重度告警', actor: '身份权限、沙箱与审计工具供应商', position: '中游', mechanism: '企业需要限制工具权限、隔离执行环境、记录操作并设置人工确认。', direction: '安全控制可能从附加功能变为部署前提。' },
+        { evidence: '数据主要来自厂商内部评估', actor: '安全研究者与采购方', position: '规则端', mechanism: '外部复现率、误报率和实际运维工时决定额外成本是否显著。', direction: '能力风险已被厂商确认，成本结论仍待独立证据。' },
+      ],
+      background: [
+        { term: '智能体', explanation: '能规划步骤并调用文件、浏览器、终端或外部服务完成任务的模型系统。', relevance: '风险来自模型能执行操作，而不只是生成文本。' },
+        { term: '最小权限', explanation: '只给程序完成当前任务所必需的最少访问范围和最短有效时间。', relevance: '即使智能体判断错误，可造成的影响也会被权限边界限制。' },
+        { term: '沙箱', explanation: '与主系统隔离的运行环境，用来限制程序可访问的文件、网络和设备。', relevance: '它降低恶意命令或误操作影响真实账号和主机的概率。' },
+        { term: '红队测试', explanation: '由安全人员主动设计攻击任务，寻找系统可被滥用或绕过的路径。', relevance: '独立红队结果能检验厂商内部评级是否可复现。' },
+      ],
+      watch: [
+        { item: '独立红队复现', signal: '任务成功率、绕过率与严重告警', meaning: '外部团队可重复得到相近结果时，风险判断更可靠。' },
+        { item: '企业控制成本', signal: '人工审批次数、隔离层级和运维工时', meaning: '它能确认更强模型是否真的提高部署总成本。' },
+        { item: '真实事故与漏洞披露', signal: '工具调用日志、受影响系统和根因', meaning: '真实事件比厂商评级更能确定最需要补强的权限边界。' },
+      ],
+    },
   },
   {
     id: 'eu-customs-reform', date: '2026-09-03', region: '欧洲', channel: '宏观贸易与规则',
@@ -291,6 +537,29 @@ export const news: NewsItem[] = [
     maturity: '立法后期，尚非最终生效文本。', sourceName: '欧盟理事会', sourceDate: '2026-09-03',
     url: 'https://www.consilium.europa.eu/en/press/press-releases/2026/09/03/eu-customs-council-greenlights-landmark-reform/',
     tags: ['欧盟海关', '跨境电商', '进口责任', '合规', '电子零件'], readMinutes: 5,
+    analysis: {
+      core: [
+        '欧盟理事会通过了海关改革的一读立场，拟让电商平台承担进口申报和合规责任。',
+        '方案还包括统一数据枢纽、严重违法罚则和小包裹处理费。',
+        '这仍不是最终生效法律，欧洲议会、最终文本和具体费用尚待确定。',
+      ],
+      logic: [
+        { evidence: '平台拟成为进口责任主体', actor: '跨境电商平台', position: '中游', mechanism: '平台需要收集商品编码、原产地和合规文件，并承担错误申报风险。', direction: '平台的数据与审核成本上升。' },
+        { evidence: '严重违法罚则与处理费被纳入方案', actor: '电子零件卖家', position: '上游', mechanism: '平台可能提高入驻要求、减少缺少材料的商品或把费用转给卖家。', direction: '低价、小批量和文件不完整的 SKU 更容易退出欧盟市场。' },
+        { evidence: '改革尚未完成立法', actor: '欧盟买家与电子爱好者', position: '下游', mechanism: '最终费用、范围和平台执行方式决定零件价格与可得性。', direction: '目前可提前整理资料，但不应把拟议规则当成已经实施。' },
+      ],
+      background: [
+        { term: '进口责任主体', explanation: '在海关记录中对申报、税费和商品合规承担法律责任的一方。', relevance: '责任转给平台后，平台会更严格要求卖家提交可核验数据。' },
+        { term: '商品编码', explanation: '海关用来识别产品类别并确定税率和监管要求的分类编号。', relevance: '同一块开发板上的模块、整机和零件可能适用不同编码。' },
+        { term: '一读立场', explanation: '立法机构在首轮程序中形成的文本立场，后续仍可能协商和修改。', relevance: '新闻确认的是立法进展，不是最终生效内容。' },
+        { term: '合规文件', explanation: '证明产品满足安全、环保、材料和标识要求的数据与声明。', relevance: '电子产品常涉及 CE、RoHS、说明书和可追溯信息。' },
+      ],
+      watch: [
+        { item: '最终立法文本', signal: '欧洲议会结果、生效时间与适用范围', meaning: '决定哪些平台、卖家和商品真正受约束。' },
+        { item: '小包裹处理费', signal: '金额、计费单位和豁免条件', meaning: '可直接估算低价元器件订单的成本变化。' },
+        { item: '平台卖家规则', signal: '新增资料字段、审核周期和下架比例', meaning: '平台规则变化是法规向商品可得性传导的早期证据。' },
+      ],
+    },
   },
   {
     id: 'us-drone-tariffs', date: '2026-09-03', eventDate: '2026-09-03', region: '美国', channel: '汽车交通与航天',
@@ -305,6 +574,29 @@ export const news: NewsItem[] = [
     watch: '检查首批清关案例、附件编码解释、渠道价格与库存，以及 2027 年新增部件税率是否按期执行。',
     maturity: '政策已生效并进入海关执行，市场传导仍待观察。', sourceName: '美国海关与边境保护局', sourceDate: '2026-09-02',
     url: 'https://content.govdelivery.com/accounts/USDHSCBP/bulletins/4281ea7', tags: ['无人机', 'FPV', '关税', '电机', '飞控'], readMinutes: 6, linkedTrackId: 'drone-tariff-impact',
+    analysis: {
+      core: [
+        '美国海关已开始按第 232 条措施对无人机系统和指定关键部件征收新关税。',
+        '税率取决于产品类别、功能、重量、原产地和海关编码，部分项目为 100%，多数小型非热成像无人机通常为 25%。',
+        '政策已经生效，但现有渠道库存可能让零售价晚于清关成本变化。',
+      ],
+      logic: [
+        { evidence: '关税在进口清关时直接计入', actor: '进口商与渠道商', position: '中游', mechanism: '到岸成本提高后，渠道可选择涨价、压缩利润、消耗旧库存或更换供应地。', direction: '短期价格变化取决于库存，长期成本压力更明确。' },
+        { evidence: '税率按编码和功能分层', actor: '整机、电机、电调、飞控和图传供应商', position: '上游', mechanism: '不同部件可能落入不同编码，企业需要逐项重新分类和核算。', direction: '产品组合和申报复杂度上升，不能用单一税率概括全部零件。' },
+        { evidence: '部分税率高达 100%', actor: '美国本地组装商与替代供应商', position: '下游', mechanism: '高税率削弱特定进口产品的价格优势，促使采购转向其他来源或本地组装。', direction: '替代供应可能受益，但要看产能、性能和认证能否满足需求。' },
+      ],
+      background: [
+        { term: '第 232 条', explanation: '美国以国家安全为理由调整特定进口产品的贸易措施。', relevance: '它是本次无人机及部件关税的法律依据。' },
+        { term: 'HTS 编码', explanation: '美国海关用于商品分类和确定税率的编码体系。', relevance: '飞控、电机、整机与带热成像功能的设备可能对应不同税率。' },
+        { term: '原产地规则', explanation: '判断商品在贸易上属于哪个国家或地区的规则，不一定等同于最后发货地。', relevance: '仅改变转运地点通常不能改变关税待遇。' },
+        { term: '到岸成本', explanation: '商品采购价加运输、保险、关税和清关等费用后的实际进口成本。', relevance: '渠道是否涨价取决于到岸成本和现有库存，而不只看出厂价。' },
+      ],
+      watch: [
+        { item: '首批清关记录与海关裁定', signal: '实际采用的编码、税率与争议处理', meaning: '可确认政策文本在具体产品上怎样执行。' },
+        { item: '同型号价格与库存', signal: '含税价、缺货率和交期连续变化', meaning: '库存消耗后仍持续涨价，才说明关税已传导到终端。' },
+        { item: '供应地与组装地变化', signal: '新供应商、本地组装和长期采购合同', meaning: '这些变化能确认企业是否在重构供应链，而非暂时吸收成本。' },
+      ],
+    },
   },
 ];
 
@@ -398,3 +690,4 @@ export const verificationTracks: VerificationTrack[] = [
     lastChangedAt: '2026-09-04',
   },
 ];
+
